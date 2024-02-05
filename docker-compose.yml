@@ -1,0 +1,8 @@
+version: "3.9"
+
+services:
+  backup:
+    restart: always
+    build: .
+    volumes:
+      - ./volumes/logs:/logs

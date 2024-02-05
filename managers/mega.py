@@ -167,6 +167,7 @@ class MegaManager:
             rf=RemoteFolder.DB,
         )
 
+
     def upload_media(self):
         print("# Upload MEDIA")
 

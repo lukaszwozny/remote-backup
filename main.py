@@ -10,10 +10,17 @@ def parse_bool(name, default=""):
     return env_var.lower() in ["true", "1", "t"]
 
 
+def test_postgres_cmd():
+    print("# Test prostgres cmd")
+
+
 def main():
     mega_enable = parse_bool("MEGA_ENABLE")
 
-    if mega_enable:
+    os.chdir("/app")
+
+    # test_postgres_cmd()
+    if mega_enable and True:
         mega_m = MegaManager(
             username=os.getenv("MEGA_USERNAME"),
             password=os.getenv("MEGA_PASSWORD"),

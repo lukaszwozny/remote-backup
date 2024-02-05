@@ -17,19 +17,13 @@ services:
       context: .
       args:
         PGPASSWORD: ${POSTGRES_PASSWORD}
-    environment:
-      - DB_WEIGHT=1
-      - MEDIA_WEIGHT=10
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - MEGA_ENABLE=true
-      - MEGA_USERNAME=mail@gmail.com
-      - MEGA_PASSWORD=mega-password
-      - DOMAIN=mywebsite.com
+        CRON_SCHEDULE: ${CRON_SCHEDULE}
     volumes:
       - ./volumes/logs:/app/logs
       - ./volumes/backups:/app/backups
       - ./volumes/media:/app/volumes/media
+    env_file:
+      - ./.env
     depends_on:
       - db
 

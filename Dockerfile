@@ -12,9 +12,11 @@ COPY . .
 RUN mkdir logs
 RUN mkdir backups
 
-COPY cronjobs /etc/crontabs/root
-
 ARG PGPASSWORD
 ENV PGPASSWORD=${PGPASSWORD}
+
+ARG CRON_SCHEDULE
+ENV CRON_SCHEDULE=${CRON_SCHEDULE}
+RUN echo -e "$CRON_SCHEDULE python /app/main.py >> /app/logs/remote_bakup.log 2>&1\n" > /etc/crontabs/root
 
 CMD ["crond", "-f", "-d", "8"]

@@ -1,7 +1,6 @@
 import mega
 import json
 import os
-import subprocess
 from datetime import datetime
 from time import sleep
 import enum
@@ -166,16 +165,10 @@ class MegaManager:
         db_name = os.getenv("POSTGRES_NAME", "postgres")
         cmd = f"pg_dump -h db -U {db_user} {db_name} | gzip > {backup_path}"
 
-        result = subprocess.check_output(cmd, shell=True)
-        print("RESULT")
-        print(result)
-        # result = os.system(cmd + " > output.txt")
-        # if result != 0:
-        #     print("Error")
-        #     print(f"output.txt content:")
-        #     with open("output.txt") as f:
-        #         print(f.read())
-        #     return None
+        result = os.system(cmd)
+        if result != 0:
+            print("  pg_dump error!")
+            return None
 
         return backup_path
 

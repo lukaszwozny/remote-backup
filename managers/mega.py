@@ -4,10 +4,24 @@ import os
 from datetime import datetime
 from time import sleep
 import enum
+import locale
+
+locale.setlocale(locale.LC_ALL, "pl_PL.utf8")
+
+# formatted_number = locale.format("%d", n, grouping=True)
 
 EMAIL = ""
 PASS = ""
 MODIFIED_FILE = "modified.json"
+
+
+def locale_print(name, number, kilo=True):
+    prefix = "B"
+    if kilo:
+        number /= 1000
+        prefix = "KB"
+    formatted_number = locale.format("%d", number, grouping=True)
+    print(f"{name:20}{formatted_number:>16} {prefix}")
 
 
 class RemoteFolder(enum.Enum):
@@ -45,7 +59,7 @@ class MegaManager:
             print(e)
 
     def get_remote_total_size(self):
-        storage = self.mega.get_storage_space(kilo=True)
+        storage = self.mega.get_storage_space()
         # self.storage_total = storage["total"]
         # self.storage_used = storage["used"]
         return storage["total"]
@@ -114,7 +128,7 @@ class MegaManager:
 
             folder_size += v["s"]
 
-        return folder_size / 1000
+        return folder_size
 
     def remote_folder_make_space(self, folder: RemoteFolder, space_needed):
         freed = 0
@@ -122,13 +136,14 @@ class MegaManager:
         if files is None:
             return 0
 
-        print(type(files.items()))
-
-        print("KEY")
         for k, v in files.items():
-            # print(f"  {k}")
-            print(f"  {v['ts']}")
-            # print(json.dumps(v, indent=2))
+            freed += v["s"]
+            # self.mega.delete(k)
+            if freed > space_needed:
+                break
+
+        # print(f"Freed {locale.format('%d', freed, grouping=True)} KB")
+        locale_print("Freed", freed)
 
     def upload_database(self):
         print("# Upload DATABASE")
@@ -140,19 +155,18 @@ class MegaManager:
         split_nr = int(split[1])
 
         final_path = os.path.join("test_data", local_file)
-        file_size = os.path.getsize(final_path) / 1000
-        print(f"size: {file_size}")
+        file_size = os.path.getsize(final_path)
+        locale_print(f"L file size", file_size)
 
         rf = RemoteFolder.DB
         rf_max_size = self.get_remote_folder_max_size(rf)
-        print(f"rf max size: {rf_max_size}")
+        locale_print(f"RF max size", rf_max_size)
 
         rf_size = self.get_remote_folder_size(rf)
-        print(f"rf size: {rf_size}")
+        locale_print(f"RF size", rf_size)
 
         rf_free_space = rf_max_size - rf_size
-        rf_free_space = 0
-        print(f"rf free size: {rf_free_space}")
+        locale_print(f"RF free space", rf_free_space)
 
         if rf_free_space < file_size:
             print("NOT ENOUGH SPACE")

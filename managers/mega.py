@@ -101,7 +101,7 @@ class MegaManager:
                 break
 
         if folder_id is None:
-            return None
+            return None, []
 
         folder_size = 0
         for k, v in self.remote_files().items():
@@ -112,12 +112,10 @@ class MegaManager:
 
         files = {k: v for k, v in sorted(files.items(), key=lambda x: x[1]["ts"])}
 
-        return files
+        return folder_id, files
 
     def get_remote_folder_size(self, folder: RemoteFolder) -> float:
-        folder_id = None
-
-        files = self.get_remote_folder_files(folder)
+        folder_id, files = self.get_remote_folder_files(folder)
         if files is None:
             return 0
 
@@ -132,13 +130,15 @@ class MegaManager:
 
     def remote_folder_make_space(self, folder: RemoteFolder, space_needed):
         freed = 0
-        files = self.get_remote_folder_files(folder)
+        _, files = self.get_remote_folder_files(folder)
         if files is None:
             return 0
 
+        print("Removing...")
         for k, v in files.items():
             freed += v["s"]
-            # self.mega.delete(k)
+            self.mega.delete(k)
+            locale_print(f"  {v['a']['n']}", v["s"])
             if freed > space_needed:
                 break
 
@@ -171,8 +171,11 @@ class MegaManager:
         if rf_free_space < file_size:
             print("NOT ENOUGH SPACE")
             self.remote_folder_make_space(rf, space_needed=file_size - rf_free_space)
-        else:
-            print("JEST SPACE")
+
+        self.upload_file(
+            filename=final_path,
+            remote_folder=rf,
+        )
         return
 
         self.upload_file(
@@ -216,13 +219,14 @@ class MegaManager:
 
         # output_filename = f"{media_path}_.tar.gz"
 
-    def upload_file(self, filename, remote_folder):
+    def upload_file(self, filename, remote_folder: RemoteFolder):
+        folder_name = remote_folder.value
         print(f"Uploading {filename}... ", end="")
-        if remote_folder and remote_folder != "":
-            folder = self.mega.find(remote_folder, exclude_deleted=True)
+        if remote_folder and folder_name != "":
+            folder = self.mega.find(folder_name, exclude_deleted=True)
             if folder is None:
-                folder = self.mega.create_folder(remote_folder)
-                folder_id = folder[remote_folder]
+                folder = self.mega.create_folder(folder_name)
+                folder_id = folder[folder_name]
             else:
                 folder_id = folder[0]
 

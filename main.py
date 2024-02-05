@@ -17,7 +17,7 @@ def main():
         mega_m = MegaManager(
             username=os.getenv("MEGA_USERNAME"),
             password=os.getenv("MEGA_PASSWORD"),
-            media_weight=3,
+            media_weight=330,
         )
 
         for i in range(1):

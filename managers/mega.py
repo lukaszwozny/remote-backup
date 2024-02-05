@@ -152,7 +152,7 @@ class MegaManager:
         locale_print("Freed", freed)
 
     def create_postgres_dump_file(self) -> str:
-        print("# Create Postgres dump file")
+        print("# Create Postgres dump file.")
 
         now = datetime.now()
         current_time = now.strftime("%Y-%m-%d_%H_%M_%S")
@@ -165,9 +165,12 @@ class MegaManager:
         db_name = os.getenv("POSTGRES_NAME", "postgres")
         cmd = f"pg_dump -h db -U {db_user} {db_name} | gzip > {backup_path}"
 
-        result = os.system(cmd)
+        result = os.system(cmd + " > output.txt")
         if result != 0:
             print("Error")
+            print(f"output.txt content:")
+            with open("output.txt") as f:
+                print(f.read())
             return None
 
         return backup_path

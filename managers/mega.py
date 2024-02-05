@@ -151,22 +151,49 @@ class MegaManager:
         # print(f"Freed {locale.format('%d', freed, grouping=True)} KB")
         locale_print("Freed", freed)
 
+    def create_postgres_dump_file(self) -> str:
+        print("# Create Postgres dump file")
+
+        now = datetime.now()
+        current_time = now.strftime("%Y-%m-%d_%H_%M_%S")
+
+        domain = os.getenv("DOMAIN", "")
+        backup_file = f"{domain}_{current_time}.sql.gz"
+
+        backup_path = os.path.join("/backups", backup_file)
+
+        db_user = os.getenv("POSTGRES_USER", "postgres")
+        db_name = os.getenv("POSTGRES_NAME", "postgres")
+        cmd = f"pg_dump -h db -U {db_user} {db_name} | gzip > {backup_path}"
+
+        result = os.system(cmd)
+        if result != 0:
+            print("Error")
+            return None
+
+        return backup_path
+
     def upload_database(self):
         print("# Upload DATABASE")
 
         # TODO Create file to upload
-        local_file = os.listdir("test_data")[0]
-        split = local_file.split(".")[0].split("-")
-        split_name = split[0]
-        split_nr = int(split[1])
-        final_path = os.path.join("test_data", local_file)
+        # local_file = os.listdir("test_data")[0]
+        # split = local_file.split(".")[0].split("-")
+        # split_name = split[0]
+        # split_nr = int(split[1])
+        # final_path = os.path.join("test_data", local_file)
+
+        path = self.create_postgres_dump_file()
+        if path is None:
+            return
         # End create file to upload
 
         self.upload_file_making_space(
-            file_path=final_path,
+            file_path=path,
             rf=RemoteFolder.DB,
         )
 
+        os.remove(path)
 
     def upload_media(self):
         print("# Upload MEDIA")
@@ -176,13 +203,15 @@ class MegaManager:
         split = local_file.split(".")[0].split("-")
         split_name = split[0]
         split_nr = int(split[1])
-        final_path = os.path.join("test_data", local_file)
+        path = os.path.join("test_data", local_file)
         # End create file to upload
 
         self.upload_file_making_space(
-            file_path=final_path,
+            file_path=path,
             rf=RemoteFolder.MEDIA,
         )
+
+        os.remove(path)
 
     def upload_file_making_space(self, file_path, rf: RemoteFolder, tabs=1):
         file_size = os.path.getsize(file_path)

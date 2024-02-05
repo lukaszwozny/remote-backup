@@ -11,35 +11,13 @@ def parse_bool(name, default=""):
     return env_var.lower() in ["true", "1", "t"]
 
 
-def test_postgres_cmd():
-    print("# Test prostgres cmd")
-    #     cmd = """ssh postgres@db "pg_dump -U postgres -h localhost -C --column-inserts" \
-    #  > backup_file_on_your_local_machine.sql"""
-    # cmd = """ssh postgres@db "pg_dumpall -h localhost -U postgres -W -d postgrees" > /logs/dump.sql"""
-    # os.system(cmd)
-    now = datetime.now()
-    current_time = now.strftime("%Y-%m-%d_%H_%M_%S")
-
-    domain = os.getenv("DOMAIN", "")
-    backup_file = f"{domain}_{current_time}.sql.gz"
-
-    backup_path = os.path.join("/backups", backup_file)
-    print(backup_path)
-    cmd = f"pg_dump -h db -U postgres postgres | gzip > {backup_path}"
-    result = os.system(cmd)
-
-    file_size = os.path.getsize(backup_path)
-    print(f"f size: {file_size}")
-    print(result)
-
-
 def main():
     mega_enable = parse_bool("MEGA_ENABLE")
 
     os.chdir("/app")
 
-    test_postgres_cmd()
-    if mega_enable and False:
+    # test_postgres_cmd()
+    if mega_enable and True:
         mega_m = MegaManager(
             username=os.getenv("MEGA_USERNAME"),
             password=os.getenv("MEGA_PASSWORD"),
@@ -52,7 +30,7 @@ def main():
 
             # Upload
             mega_m.upload_database()
-            mega_m.upload_media()
+            # mega_m.upload_media()
 
             # Rename
             split = media_file.split(".")[0].split("-")

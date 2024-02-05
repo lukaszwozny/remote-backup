@@ -199,12 +199,11 @@ class MegaManager:
 
         # TODO Create file to upload
         media_folder_path = "volumes/media"
-        current_modified_time = os.stat(media_folder_path).st_mtime
 
         # Load settings
         settings_path = "backups/settings.json"
         settings = {
-            "mediaModifiedTime": current_modified_time,
+            "mediaModifiedTime": 0,
         }
         if not os.path.exists(settings_path):
             with open(settings_path, "w+") as f:
@@ -215,6 +214,7 @@ class MegaManager:
 
         prev_modified_time = settings["mediaModifiedTime"]
 
+        current_modified_time = os.stat(media_folder_path).st_mtime
         if current_modified_time == prev_modified_time:
             print("NO CHANGEWS")
             return

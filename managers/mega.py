@@ -15,11 +15,17 @@ PASS = ""
 MODIFIED_FILE = "modified.json"
 
 
-def locale_print(name, number, kilo=True):
+def locale_print(name, number, kilo=True, tabs=0):
     prefix = "B"
     if kilo:
         number /= 1000
         prefix = "KB"
+
+    tabs_s = ""
+    for t in range(tabs):
+        tabs_s += "  "
+    name = tabs_s + name
+
     formatted_number = locale.format("%d", number, grouping=True)
     print(f"{name:20}{formatted_number:>16} {prefix}")
 
@@ -147,82 +153,61 @@ class MegaManager:
 
     def upload_database(self):
         print("# Upload DATABASE")
-        # media_path = self.settings["MEDIA_PATH"]
-        # media_path = "test_data/clonezilla-1.iso"
+
+        # TODO Create file to upload
         local_file = os.listdir("test_data")[0]
         split = local_file.split(".")[0].split("-")
         split_name = split[0]
         split_nr = int(split[1])
-
         final_path = os.path.join("test_data", local_file)
-        file_size = os.path.getsize(final_path)
-        locale_print(f"L file size", file_size)
+        # End create file to upload
 
-        rf = RemoteFolder.DB
-        rf_max_size = self.get_remote_folder_max_size(rf)
-        locale_print(f"RF max size", rf_max_size)
-
-        rf_size = self.get_remote_folder_size(rf)
-        locale_print(f"RF size", rf_size)
-
-        rf_free_space = rf_max_size - rf_size
-        locale_print(f"RF free space", rf_free_space)
-
-        if rf_free_space < file_size:
-            print("NOT ENOUGH SPACE")
-            self.remote_folder_make_space(rf, space_needed=file_size - rf_free_space)
-
-        self.upload_file(
-            filename=final_path,
-            remote_folder=rf,
+        self.upload_file_making_space(
+            file_path=final_path,
+            rf=RemoteFolder.DB,
         )
-        return
-
-        self.upload_file(
-            filename=final_path,
-            remote_folder="DB",
-        )
-
-        # was_mod = was_modified(media_path)
-        # if not was_mod:
-        #     print(f'No changes found in "{media_path}". Skipped!')
-        #     return
-
-        # folder_name = "MEDIA"
-        # dir = os.path.join("temp", folder_name)
-
-        # output_filename = f"{media_path}_.tar.gz"
 
     def upload_media(self):
         print("# Upload MEDIA")
-        # media_path = self.settings["MEDIA_PATH"]
-        # media_path = "test_data/clonezilla-1.iso"
+
+        # TODO Create file to upload
         local_file = os.listdir("test_data")[0]
         split = local_file.split(".")[0].split("-")
         split_name = split[0]
         split_nr = int(split[1])
-
         final_path = os.path.join("test_data", local_file)
+        # End create file to upload
 
-        self.upload_file(
-            filename=final_path,
-            remote_folder="MEDIA",
+        self.upload_file_making_space(
+            file_path=final_path,
+            rf=RemoteFolder.MEDIA,
         )
 
-        # was_mod = was_modified(media_path)
-        # if not was_mod:
-        #     print(f'No changes found in "{media_path}". Skipped!')
-        #     return
+    def upload_file_making_space(self, file_path, rf: RemoteFolder, tabs=1):
+        file_size = os.path.getsize(file_path)
+        locale_print(f"L file size", file_size, tabs=tabs)
 
-        # folder_name = "MEDIA"
-        # dir = os.path.join("temp", folder_name)
+        rf_max_size = self.get_remote_folder_max_size(rf)
+        locale_print(f"RF max size", rf_max_size, tabs=tabs)
 
-        # output_filename = f"{media_path}_.tar.gz"
+        rf_size = self.get_remote_folder_size(rf)
+        locale_print(f"RF size", rf_size, tabs=tabs)
 
-    def upload_file(self, filename, remote_folder: RemoteFolder):
-        folder_name = remote_folder.value
-        print(f"Uploading {filename}... ", end="")
-        if remote_folder and folder_name != "":
+        rf_free_space = rf_max_size - rf_size
+        locale_print(f"RF free space", rf_free_space, tabs=tabs)
+
+        if rf_free_space < file_size:
+            self.remote_folder_make_space(rf, space_needed=file_size - rf_free_space)
+
+        self.upload_file(
+            filename=file_path,
+            rf=rf,
+        )
+
+    def upload_file(self, filename, rf: RemoteFolder):
+        folder_name = rf.value
+        print(f"Uploading {filename} to {rf.value}/... ", end="")
+        if rf and folder_name != "":
             folder = self.mega.find(folder_name, exclude_deleted=True)
             if folder is None:
                 folder = self.mega.create_folder(folder_name)

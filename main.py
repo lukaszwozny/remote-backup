@@ -26,7 +26,7 @@ def main():
 
             # Upload
             mega_m.upload_database()
-            # mega_m.upload_media()
+            mega_m.upload_media()
 
             # Rename
             split = media_file.split(".")[0].split("-")

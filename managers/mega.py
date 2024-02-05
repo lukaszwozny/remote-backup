@@ -198,19 +198,52 @@ class MegaManager:
         print("# Upload MEDIA")
 
         # TODO Create file to upload
-        local_file = os.listdir("test_data")[0]
-        split = local_file.split(".")[0].split("-")
-        split_name = split[0]
-        split_nr = int(split[1])
-        path = os.path.join("test_data", local_file)
-        # End create file to upload
+        media_folder_path = "volumes/media"
+        current_modified_time = os.stat(media_folder_path).st_mtime
 
+        # Load settings
+        settings_path = "backups/settings.json"
+        settings = {
+            "mediaModifiedTime": current_modified_time,
+        }
+        if not os.path.exists(settings_path):
+            with open(settings_path, "w+") as f:
+                json.dump(settings, f, indent=2)
+        else:
+            with open(settings_path) as f:
+                settings = json.load(f)
+
+        prev_modified_time = settings["mediaModifiedTime"]
+
+        if current_modified_time == prev_modified_time:
+            print("NO CHANGEWS")
+            return
+
+        print("NEW MODIFICATION")
+        # Create media archive
+        now = datetime.now()
+        current_time = now.strftime("%Y-%m-%d_%H_%M_%S")
+        domain = os.getenv("DOMAIN", "")
+        media_output_path = f"backups/{domain}_{current_time}.tar.gz"
+
+        cmd = f"tar -zcf {media_output_path} -C {media_folder_path} ."
+        os.system(cmd)
+
+        # Upload media to cloud
         self.upload_file_making_space(
-            file_path=path,
+            file_path=media_output_path,
             rf=RemoteFolder.MEDIA,
         )
 
-        os.remove(path)
+        # Save mediaModifiedTime
+        settings = {
+            "mediaModifiedTime": current_modified_time,
+        }
+        with open(settings_path, "w+") as f:
+            json.dump(settings, f, indent=2)
+
+        # Remove archive
+        os.remove(media_output_path)
 
     def upload_file_making_space(self, file_path, rf: RemoteFolder, tabs=1):
         file_size = os.path.getsize(file_path)

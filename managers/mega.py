@@ -159,7 +159,7 @@ class MegaManager:
         domain = os.getenv("DOMAIN", "")
         backup_file = f"{domain}_{current_time}.sql.gz"
 
-        backup_path = os.path.join("/backups", backup_file)
+        backup_path = os.path.join("backups", backup_file)
 
         db_user = os.getenv("POSTGRES_USER", "postgres")
         db_name = os.getenv("POSTGRES_NAME", "postgres")

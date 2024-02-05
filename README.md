@@ -1,3 +1,6 @@
+docker-compsoe.yml
+
+```yml
 version: "3.9"
 
 services:
@@ -34,3 +37,4 @@ services:
 
 volumes:
   data-postgres:
+```

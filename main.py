@@ -12,6 +12,13 @@ def parse_bool(name, default=""):
 
 def test_postgres_cmd():
     print("# Test prostgres cmd")
+    #     cmd = """ssh postgres@db "pg_dump -U postgres -h localhost -C --column-inserts" \
+    #  > backup_file_on_your_local_machine.sql"""
+    # cmd = """ssh postgres@db "pg_dumpall -h localhost -U postgres -W -d postgrees" > /logs/dump.sql"""
+    # os.system(cmd)
+    cmd = """pg_dump -h db -U postgres postgres | gzip > /logs/backup.gz"""
+    result = os.system(cmd)
+    print(result)
 
 
 def main():
@@ -19,8 +26,8 @@ def main():
 
     os.chdir("/app")
 
-    # test_postgres_cmd()
-    if mega_enable and True:
+    test_postgres_cmd()
+    if mega_enable and False:
         mega_m = MegaManager(
             username=os.getenv("MEGA_USERNAME"),
             password=os.getenv("MEGA_PASSWORD"),

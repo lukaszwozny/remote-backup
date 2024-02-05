@@ -19,6 +19,7 @@ services:
         PGPASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - ./volumes/logs:/logs
+      - ./volumes/backups:/backups
     depends_on:
       - db
     env_file:

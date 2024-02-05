@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
 from managers.mega import MegaManager
+from datetime import datetime
 
 load_dotenv()
 
@@ -16,8 +17,19 @@ def test_postgres_cmd():
     #  > backup_file_on_your_local_machine.sql"""
     # cmd = """ssh postgres@db "pg_dumpall -h localhost -U postgres -W -d postgrees" > /logs/dump.sql"""
     # os.system(cmd)
-    cmd = """pg_dump -h db -U postgres postgres | gzip > /logs/backup.gz"""
+    now = datetime.now()
+    current_time = now.strftime("%Y-%m-%d_%H_%M_%S")
+
+    domain = os.getenv("DOMAIN", "")
+    backup_file = f"{domain}_{current_time}.sql.gz"
+
+    backup_path = os.path.join("/backups", backup_file)
+    print(backup_path)
+    cmd = f"pg_dump -h db -U postgres postgres | gzip > {backup_path}"
     result = os.system(cmd)
+
+    file_size = os.path.getsize(backup_path)
+    print(f"f size: {file_size}")
     print(result)
 
 

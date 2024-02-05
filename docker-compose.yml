@@ -13,7 +13,8 @@ services:
   backup:
     restart: always
     build:
-      context: https://github.com/lukaszwozny/remote-backup.git
+      # context: https://github.com/lukaszwozny/remote-backup.git
+      context: .
       args:
         PGPASSWORD: ${POSTGRES_PASSWORD}
     environment:

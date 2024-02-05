@@ -22,6 +22,7 @@ services:
     environment:
       - DB_WEIGHT=1
       - MEDIA_WEIGHT=10
+      - CRON_SCHEDULE=0 3 * * *
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - MEGA_ENABLE=true
@@ -79,6 +80,7 @@ volumes:
 ```
 DB_WEIGHT=1
 MEDIA_WEIGHT=10
+CRON_SCHEDULE=0 3 * * *
 
 MEGA_ENABLE=true
 MEGA_USERNAME=mail@gmail.com

@@ -1,1 +1,1 @@
-* * * * * python /app/main.py >> /logs/remote_bakup.log 2>&1
+* * * * * python /app/main.py >> /app/logs/remote_bakup.log 2>&1

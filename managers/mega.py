@@ -156,7 +156,6 @@ class MegaManager:
 
         now = datetime.now()
         current_time = now.strftime("%Y-%m-%d_%H_%M_%S")
-
         domain = os.getenv("DOMAIN", "")
         backup_file = f"{domain}_{current_time}.sql.gz"
 

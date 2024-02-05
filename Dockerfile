@@ -10,8 +10,8 @@ RUN pip install -r requirements.txt
 WORKDIR /app
 COPY . .
 
-RUN mkdir /logs
-RUN mkdir /backups
+RUN mkdir logs
+RUN mkdir backups
 
 # copy crontabs for root user
 COPY cronjobs /etc/crontabs/root
